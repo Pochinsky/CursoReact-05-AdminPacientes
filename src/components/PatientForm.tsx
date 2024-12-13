@@ -1,40 +1,68 @@
+import { useForm } from "react-hook-form";
+import Error from "./Error";
+import type { DraftPatient } from "../types";
+import { usePatientStore } from "../store";
+
 export default function PatientForm() {
+  const { addPatient } = usePatientStore();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<DraftPatient>();
+
+  const registerPatient = (data: DraftPatient) => {
+    addPatient(data);
+    reset();
+  };
+
   return (
     <div className="md:w-1/2 lg:w-2/5 mx-5">
-      <h2 className="font-black text-3xl text-center">Seguimiento Pacientes</h2>
+      <h2 className="font-black text-3xl text-center">Registro de pacientes</h2>
       <p className="text-lg mt-5 text-center mb-10">
-        Añade Pacientes y {""}
+        Añade pacientes y {""}
         <span className="text-indigo-600 font-bold">Administralos</span>
       </p>
       <form
         className="bg-white shadow-md rounded-lg py-10 px-5 mb-10"
         noValidate
+        onSubmit={handleSubmit(registerPatient)}
       >
-        {/* Field */}
+        {/* Field: Name */}
         <div className="mb-5">
           <label htmlFor="name" className="text-sm uppercase font-bold">
-            Paciente
+            Nombre del animal
           </label>
           <input
             id="name"
             className="w-full p-3  border border-gray-100"
             type="text"
-            placeholder="Nombre del Paciente"
+            placeholder="Ej: Canela"
+            {...register("name", {
+              required: "El nombre del animal es obligatorio",
+            })}
           />
+          {errors.name && <Error>{errors.name?.message}</Error>}
         </div>
-        {/* Field */}
+        {/* Field: Caretaker */}
         <div className="mb-5">
           <label htmlFor="caretaker" className="text-sm uppercase font-bold">
-            Propietario
+            Nombre de el/la cuidadorx
           </label>
           <input
             id="caretaker"
             className="w-full p-3  border border-gray-100"
             type="text"
-            placeholder="Nombre del Propietario"
+            placeholder="Ej: Pedro"
+            {...register("caretaker", {
+              required: "El nombre de el/la cuidadorx es obligatorio",
+            })}
           />
+          {errors.caretaker && <Error>{errors.caretaker?.message}</Error>}
         </div>
-        {/* Field */}
+        {/* Field: Email */}
         <div className="mb-5">
           <label htmlFor="email" className="text-sm uppercase font-bold">
             Email
@@ -43,10 +71,18 @@ export default function PatientForm() {
             id="email"
             className="w-full p-3  border border-gray-100"
             type="email"
-            placeholder="Email de Registro"
+            placeholder="Ej: pedro@gmail.com"
+            {...register("email", {
+              required: "El email es obligatorio",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Email No Válido",
+              },
+            })}
           />
+          {errors.email && <Error>{errors.email?.message}</Error>}
         </div>
-        {/* Field */}
+        {/* Field: Date */}
         <div className="mb-5">
           <label htmlFor="date" className="text-sm uppercase font-bold">
             Fecha Alta
@@ -55,9 +91,13 @@ export default function PatientForm() {
             id="date"
             className="w-full p-3  border border-gray-100"
             type="date"
+            {...register("date", {
+              required: "La fecha de alta es obligatoria",
+            })}
           />
         </div>
-        {/* Field */}
+        {errors.date && <Error>{errors.date?.message}</Error>}
+        {/* Field: Symptoms */}
         <div className="mb-5">
           <label htmlFor="symptoms" className="text-sm uppercase font-bold">
             Síntomas
@@ -65,12 +105,16 @@ export default function PatientForm() {
           <textarea
             id="symptoms"
             className="w-full p-3  border border-gray-100"
-            placeholder="Síntomas del paciente"
+            placeholder="Ej: vómitos"
+            {...register("symptoms", {
+              required: "Los síntomas son obligatorios",
+            })}
           ></textarea>
+          {errors.symptoms && <Error>{errors.symptoms?.message}</Error>}
         </div>
         <input
           type="submit"
-          className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors"
+          className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors rounded-lg"
           value="Guardar Paciente"
         />
       </form>
